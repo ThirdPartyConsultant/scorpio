@@ -1,10 +1,11 @@
 #!/usr/bin/python
 
 from flask import request, Flask, jsonify
+from flask import send_from_directory
 
 app = Flask(__name__)
 apiPath="/api/v1/"
-localstorepath="/var/storage/"
+localstorepath="/tmp/storage/"
 
 @app.route(apiPath+'<uid>/<path:actionPath>')
 def fileHandler(uid, actionPath):
@@ -59,6 +60,9 @@ def me():
     }
     return jsonify(result)
 
+@app.route(apiPath+'filesroot/<path:filename>')
+def getFile(filename):
+    return send_from_directory(localstorepath, filename, as_attachment=True)
 
 @app.route(apiPath+'filesroot')
 def filesroot():
