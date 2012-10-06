@@ -31,7 +31,7 @@ def urlforusers():
     return jsonify(result)
 
 
-@app.route(apiPath+'/sessiontoken')
+@app.route(apiPath+'sessiontoken')
 def sessiontoken():
     # show the user profile for that user
     loginName = request.args.get('loginName', '')
