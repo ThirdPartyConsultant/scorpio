@@ -1,7 +1,7 @@
 import os,sys
 
 class LocalFileHandler:
-    def __init__(self, rootPath="/tmp/"):
+    def __init__(self, rootPath="/tmp"):
         self.rootPath = rootPath
 
     def listDir(self,path=""):
@@ -23,5 +23,5 @@ class LocalFileHandler:
         os.makedirs(self.rootPath+path)
 
     def listRoot(self):
-        return os.listDir(self.rootPath)
+        return os.listdir(self.rootPath)
         
