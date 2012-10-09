@@ -1,13 +1,24 @@
 #!/usr/bin/python
 
+import os
+
 from flask import request, Flask, jsonify
-from flask import send_from_directory
+from flask import redirect, url_for, send_from_directory
+from werkzeug import secure_filename
 from LocalFileHandler import LocalFileHandler 
 
-app = Flask(__name__)
-apiPath="/api/v1/"
-localstorepath="/tmp/storage/"
+apiPath = "/api/v1/"
+upload_folder = "/tmp/storage"
+localstorepath = "/tmp/storage/"
+allow_extensions = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 hostIP='10.1.192.65'
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = upload_folder
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1] in allow_extensions
 
 @app.route('/api/version')
 def currentversion():
@@ -479,6 +490,32 @@ def filesroot():
 }
 
     return jsonify(result)
+
+@app.route(apiPath + 'upload_file', methods=['GET', 'POST'])
+def upload_file():
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder)
+
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('uploaded_file', filename=filename))
+
+    return '''
+    <!doctype html>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form action="" method=post enctype=multipart/form-data>
+      <p><input type=file name=file>
+         <input type=submit value=Upload>
+    </form>
+    '''
+
+@app.route(apiPath + 'uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == "__main__":
     app.debug = True
