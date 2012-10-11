@@ -491,12 +491,12 @@ def filesroot():
 
     return jsonify(result)
 
-@app.route(apiPath + 'upload_file', methods=['GET', 'POST'])
+@app.route(apiPath + 'upload_file', methods=['GET', 'POST', 'PUT'])
 def upload_file():
     if not os.path.exists(upload_folder):
         os.makedirs(upload_folder)
 
-    if request.method == 'POST':
+    if request.method == 'POST' or request.method == 'PUT':
         file = request.files['file']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
