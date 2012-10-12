@@ -1,7 +1,7 @@
 import os,sys,time,copy
 
 class LocalFileHandler:
-    def __init__(self, rootPath="/tmp"):
+    def __init__(self, rootPath="/tmp/storage"):
         self.rootPath = rootPath
 
     def listDir(self,path=""):
@@ -32,9 +32,10 @@ class LocalFileHandler:
         return os.listdir(self.rootPath)
         
 class ThinSyncListStructure:
-    def __init__(self):
+    def __init__(self,rootPath="/tmp"):
+    	self.rootPath = rootPath
         self.curList = []
-        self.filestruct =  {"icon":"text",
+        self.filestruct =  {"icon":"",
                            "actions":[
                              {"id":"download"},
                              {"id":"downloadMulti"},
@@ -78,7 +79,7 @@ class ThinSyncListStructure:
         
     def createFile(self,myfile):
     	ret = copy.deepcopy(self.filestruct)
-    	ret['name'] = myfile['name']
+    	ret['name'] = myfile['name'].split('.')[0]
     	ret['displayModified'] = myfile['displaytime']
     	ret['displaySize'] = myfile['displaysize']
     	ret['modified'] = myfile['mtime']

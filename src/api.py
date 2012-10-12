@@ -9,7 +9,7 @@ from LocalFileHandler import LocalFileHandler,ThinSyncDirFileCreate
 
 apiPath = "/api/v1/"
 upload_folder = "/tmp/storage"
-localstorepath = "/tmp/storage/"
+localstorepath = "/tmp/storage"
 allow_extensions = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 hostIP='10.1.192.65'
 
@@ -108,9 +108,12 @@ def nobinroot():
     }
 
     return jsonify(result)
-
 @app.route(apiPath+'Mvf/')
-def Mvf():
+@app.route(apiPath+'Mvf/<file>',methods=['GET','POST','PUT'])
+def Mvf(file=None):
+    if request.method == 'GET' and file:
+    	return send_from_directory(localstorepath, file, as_attachment=True)
+    	
     result = {
 "icon":"folder",
 "actions":[
