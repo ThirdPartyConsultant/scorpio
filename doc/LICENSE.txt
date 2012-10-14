@@ -1,0 +1,13 @@
+
+The scorpio project is an open source project.
+However, we haven't device which license type we will use.
+At this moment, feel free to use the source code and all the
+license belongs to following contributors:
+
+Ian Lin
+Chun-I Yu
+Sam Chen
+Evelyn Lin
+Tao-Sheng Chen
+
+
