@@ -117,7 +117,8 @@ def Mvf(file=None):
 		locFileObj = LocalFileHandler()
 		
 		if varAction == 'Create' and file:
-			locFileObj.mkdirs(file+"/"+varName)
+			print "create directories "+upload_folder+"/"+file+varName
+			locFileObj.mkdirs("/"+file+varName)
 		
 		elif varAction == 'Create':
 			#print "varname = "+varName
