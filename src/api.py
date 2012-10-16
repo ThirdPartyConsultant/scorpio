@@ -108,13 +108,36 @@ def nobinroot():
     }
 
     return jsonify(result)
-@app.route(apiPath+'Mvf/')
-@app.route(apiPath+'Mvf/<file>',methods=['GET','POST','PUT'])
+@app.route(apiPath+'Mvf/',methods=['GET','POST','PUT'])
+@app.route(apiPath+'Mvf/<path:file>',methods=['GET','POST','PUT'])
 def Mvf(file=None):
+    if request.method == 'POST':
+		varAction = request.args.get('action', '')
+		varName = "/" + request.args.get('name',"")
+		locFileObj = LocalFileHandler()
+		
+		if varAction == 'Create' and file:
+			locFileObj.mkdirs(file+"/"+varName)
+		
+		elif varAction == 'Create':
+			#print "varname = "+varName
+			locFileObj.mkdirs(varName)
+		
+		result = {"Code":"CREATED",
+					"Message":"CREATED",
+					"Status":"OK",
+					"added":[]}
+		
+		return jsonify(result)
+
     if request.method == 'GET' and file:
-    	return send_from_directory(localstorepath, file, as_attachment=True)
-    	
-    result = {
+        if(LocalFileHandler().checkDir(file)):
+        	result = ThinSyncDirFileCreate().processDirList("/"+file)
+	    	return jsonify(result) 
+        else:
+    		return send_from_directory(localstorepath, file, as_attachment=True)
+    else:
+		result = {
 "icon":"folder",
 "actions":[
   {"id":"downloadMulti"},
@@ -153,10 +176,10 @@ def Mvf(file=None):
     "perPage":100,
     "items":"2",
     "pages":1
-    }
-    result['node'] = ThinSyncDirFileCreate().processFileList()
-
-    return jsonify(result) 
+    		}
+		result['node'] = ThinSyncDirFileCreate().processFileList()
+		print result
+		return jsonify(result) 
 
 @app.route(apiPath+'me')
 def me():
