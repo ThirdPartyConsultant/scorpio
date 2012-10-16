@@ -195,7 +195,7 @@ class ThinSyncDirFileCreate:
 		ret['node'] = subNode.processFileList()
 		modpath = path.rsplit("/",1)[0]
 		ret['parent'] = "/api/v1/Mvf/" + modpath.lstrip("/")
-		ret['uri'] = "/api/v1/Mvf"+path
+		ret['uri'] = "/api/v1/Mvf"+path+"/"
 		ret['items'] = subNode.getCount()
 		ret['name'] = path.split('/').pop(-1)
 		#print "My path = " + ret['name']

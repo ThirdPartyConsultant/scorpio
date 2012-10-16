@@ -111,6 +111,16 @@ def nobinroot():
 @app.route(apiPath+'Mvf/',methods=['GET','POST','PUT'])
 @app.route(apiPath+'Mvf/<path:file>',methods=['GET','POST','PUT'])
 def Mvf(file=None):
+
+    if request.method == 'PUT':
+		file = "/"+file
+		filename = file.rsplit("/",1)[1]
+		print "directories = /tmp/storage"+file
+		with open(("/tmp/storage"+file), 'w') as f:
+			f.write(request.data)
+		ret = {}
+		return jsonify(ret)
+
     if request.method == 'POST':
 		varAction = request.args.get('action', '')
 		varName = "/" + request.args.get('name',"")
