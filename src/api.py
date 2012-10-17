@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+#
 import os
 
 from flask import request, Flask, jsonify
@@ -8,8 +8,9 @@ from werkzeug import secure_filename
 from LocalFileHandler import LocalFileHandler,ThinSyncDirFileCreate
 
 apiPath = "/api/v1/"
-upload_folder = "/tmp/storage"
 localstorepath = "/tmp/storage"
+upload_folder = localstorepath
+
 allow_extensions = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 hostIP='10.1.192.65'
 
@@ -39,14 +40,14 @@ def urlforusers():
     result = {
   "Code": "" ,
   "Status": "OK" , 
-  "me": "https://dc1.safesync.com/api/v1/me" ,
-  "filesroot": "https://dc1.safesync.com/api/v1/filesroot" ,
-  "home": "https://dc1.safesync.com/api/v1/home" ,
-  "sessiontoken": "https://dc1.safesync.com/api/v1/sessiontoken" ,
-  "recyclebin": "https://dc1.safesync.com/api/v1/recyclebin" ,
-  "teamfolders": "https://dc1.safesync.com/api/v1/:files:teamspaces" ,
-  "safesyncfolder": "https://dc1.safesync.com/api/v1/:home:safesyncfolder" ,
-  "pairfolders": "https://dc1.safesync.com/api/v1/:home:pairfolders"
+  "me": "https://%s/api/v1/me"%(hostIP) ,
+  "filesroot": "https://%s/api/v1/filesroot"%(hostIP) ,
+  "home": "https://%s/api/v1/home"%(hostIP) ,
+  "sessiontoken": "https://%s/api/v1/sessiontoken"%(hostIP) ,
+  "recyclebin": "https://%s/api/v1/recyclebin"%(hostIP) ,
+  "teamfolders": "https://%s/api/v1/:files:teamspaces"%(hostIP) ,
+  "safesyncfolder": "https://%s/api/v1/:home:safesyncfolder"%(hostIP) ,
+  "pairfolders": "https://%s/api/v1/:home:pairfolders"%(hostIP)
     }
     return jsonify(result)
 
@@ -115,8 +116,8 @@ def Mvf(file=None):
     if request.method == 'PUT':
 		file = "/"+file
 		filename = file.rsplit("/",1)[1]
-		print "directories = /tmp/storage"+file
-		with open(("/tmp/storage"+file), 'w') as f:
+		print "directories = "+ upload_folder +file
+		with open((upload_folder+file), 'w') as f:
 			f.write(request.data)
 		ret = {}
 		return jsonify(ret)
@@ -253,7 +254,7 @@ def filesroot():
             "sharingId": "sharing:99999999-000000001", 
             "sharingURI": "/api/v1/sharing:99999999-000000001", 
             "thumb": "null", 
-            "uri": "https://dc1.safesync.com/api/v1/Fxxxx/"
+            "uri": "https://%s/api/v1/Fxxxx/"%(hostIP)
         }, 
         {
             "actions": [
@@ -273,7 +274,7 @@ def filesroot():
             "open": 0, 
             "overlays":"null", 
             "thumb": "null", 
-            "uri": "https://dc1.safesync.com/api/v1/99999999:recyclebins"
+            "uri": "https://%s/api/v1/99999999:recyclebins"%(hostIP)
         }
     ], 
     "noun": "container", 
@@ -285,7 +286,7 @@ def filesroot():
     "parent": "null", 
     "perPage": 100, 
     "treeRoot": "filesroot", 
-    "uri": "https://dc1.safesync.com/api/v1/filesroot"
+    "uri": "https://%s/api/v1/filesroot"%(hostIP)
 }
 
     return jsonify(result)
