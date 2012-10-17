@@ -1,0 +1,100 @@
+
+
+(1). INTRODUCTION.
+
+We believe that it might be useful in "green energy" solution.
+Therefore, an experimental server was designed and installed.
+
+The whole structure is simple:
+
+
+[*******]
+[ Solar ]
+[ Power ]=> DC-DC Adopter ==> 5V USB ==> external power supply ==> PI
+[ Board ]
+[*******]
+
+
+And the PI runs the scorpio project. This provide a "green energy mobile 
+sync solution".
+
+
+(2). Install scorpio in PI
+
+    1. install 3rd party tools via apt
+        (a) you might need only one line in your apt source:
+              deb http://ftp.uk.debian.org/debian/ squeeze main
+        (b) install following pacakges
+           #apt-get install python
+           #apt-get install python-pip
+           #apt-get install nigix
+        (c) prepare SSL key
+           #openssl genrsa -out thin.key 1024
+           #openssl req -new -x509 -key thin.key thin.crt -days 7300
+           #openssl req -new -x509 -key thin.key -out thin.crt -days 7300
+
+        (d) modify /etc/nginx/nginx.conf as following
+           
+           
+------ /etc/nginx/nginx.conf ------
+worker_processes        1;
+
+error_log  /var/log/nginx/error.log;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  1024;
+    # multi_accept on;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+
+    access_log  /var/log/nginx/access.log;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+    tcp_nodelay        on;
+
+    gzip  on;
+    gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+
+    server {
+        listen       443;
+        server_name  _;
+        #charset koi8-r;
+        #access_log  logs/host.access.log  main;
+        error_page  404              /404.html;
+        ssl                     on;
+        ssl_certificate         /home/carbon/thin.crt;
+        ssl_certificate_key     /home/carbon/thin.key;
+
+        location = /404.html {
+            root   /usr/share/nginx/html;
+        }
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+
+       ssl_session_timeout  5m;
+
+       ssl_protocols  SSLv2 SSLv3 TLSv1;
+       ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+       ssl_prefer_server_ciphers   on;
+       location ~* {
+           proxy_pass http://127.0.0.1:8111;
+       }
+
+    }
+
+}
+
+----- end of /etc/nginx/nginx.conf --------
+
