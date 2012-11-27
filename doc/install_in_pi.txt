@@ -98,3 +98,17 @@ http {
 
 ----- end of /etc/nginx/nginx.conf --------
 
+(3) install sagittarius (the fastcgi with lighttpd)
+    3.1 install pip flask and flup
+        # apt-get install python-pip
+        # pip install flask
+        # pip install flup
+    3.2 prepare lighttpd config
+        src/config/lighttpd.conf
+    3.3 make sure the sagittarius.cgi and sagittarius.py in right place
+        [TODO: more explain latter]
+    3.4 start lighttpd
+        # /etc/init.d/lighttpd start
+   
+
+    
