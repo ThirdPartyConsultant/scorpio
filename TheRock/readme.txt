@@ -16,7 +16,7 @@ Purpose: provide a easy utility for mobile to control Raspberry PI.
 
     (1.3) copy conf files
         * cp /root/github/scorpio/TheRock/config/nginx_therock.conf /etc/nginx/sites-available/therock
-        * cp /root/github/scorpio/TheRock/config/nginx_therock.conf /etc/nginx/sites-available/therock
+        * ln -s /etc/nginx/sites-available/therock /etc/nginx/sites-enabled/therock
      
     (1.4) restart nginx and uwsgi
 
