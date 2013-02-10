@@ -6,12 +6,8 @@ Project scorpio.
 
 2. Current Status
     * Leverage simple python-flask to provide web-api layer
-    * try to make a workable web-api to fit current SaaS providers client
+    * still in very early phase, this document is a mess...
 
-3. Notes
-    * run simple example (that is just an example, nothing more)
-      #python api.py
-
-4. How to join
+3. How to join
     send mail to consultant.3rd@gmail.com
         
