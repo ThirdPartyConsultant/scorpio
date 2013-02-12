@@ -24,3 +24,5 @@ Purpose: provide a easy utility for mobile to control Raspberry PI.
 
     (2.1) /hello 
         return {'msg':'hello'}
+
+    (2.2) 
