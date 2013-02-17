@@ -1,4 +1,5 @@
 
+import sys
 from flask import request, Flask, jsonify
 from flask import redirect, url_for, send_from_directory
 from commandDispatcher import CommandDispatcher
@@ -15,7 +16,11 @@ def hello():
 @app.route("/command/<action>")
 def action(action):
     if commandDispatcher.isAction(action):
-        result = {"execute":action}
+        try: 
+            result_from_action = commandDispatcher.execute(action)
+            result = {"execution result":result_from_action}
+        except :
+            result = {"error": sys.exc_info()[0]}
     else:
         result = {"error":"no such action"}
     return jsonify(result)

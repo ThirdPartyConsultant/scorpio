@@ -19,10 +19,15 @@ Purpose: provide a easy utility for mobile to control Raspberry PI.
         * ln -s /etc/nginx/sites-available/therock /etc/nginx/sites-enabled/therock
      
     (1.4) restart nginx and uwsgi
+        !! the two service must run in root permission to control GPIO
 
 (2) api
 
     (2.1) /hello 
         return {'msg':'hello'}
 
-    (2.2) 
+    (2.2) /command/<action>
+
+       current actions:
+       * turn_on_light (turn the LED in pin-18 to on)
+       * turn_off_light (turn the LED in pin-18 to off)

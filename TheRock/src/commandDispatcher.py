@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import sys
 import time
 
 class CommandDispatcher:
@@ -10,13 +11,19 @@ class CommandDispatcher:
         return self.executionDict.has_key(action)
 
     def execute(self, action):
-        self.executionDict[action]()
-
+        try:
+            self.executionDict[action]()
+            return "done"
+        except:
+            return "somethine wrong", sys.exc_info()[0]
+            
     def _turn_on_light(self):
+        GPIO.setmode(GPIO.BOARD)
         GPIO.setup(18, GPIO.OUT)
         GPIO.output(18, False)
 
     def _turn_off_light(self):
+        GPIO.setmode(GPIO.BOARD)
         GPIO.setup(18, GPIO.OUT)
         GPIO.output(18, True)
 
