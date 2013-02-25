@@ -10,6 +10,7 @@ Purpose: provide a easy utility for mobile to control Raspberry PI.
         #apt-get install uwsgi
         #apt-get install python
         #apt-get install nginx
+        #apt-get install python-flask
 
     (1.2) check-out file from github, here assume that the folder is:
         /root/github/scorpio/TheRock/
