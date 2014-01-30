@@ -1,17 +1,29 @@
-
 import sys
 from flask import request, Flask, jsonify
 from flask import redirect, url_for, send_from_directory
-from commandDispatcher import CommandDispatcher
+from apiHandler import ApiHandler
 
 
 app = Flask(__name__)
-commandDispatcher = CommandDispatcher()
+commandDispatcher = ApiHandler()
 
-@app.route("/hello")
+@app.route("/hello", methods=['GET', 'POST'])
 def hello():
-    result = {'msg':'hello'}
+    result = {'msg':'hello boss'}
     return jsonify(result)
+
+@app.route("/services", methods=['GET'])
+def get_all_services():
+    result ={'services':['a','b']}
+    return jsonify(result)
+
+@app.route("/service", methods=['PUT','POST'])
+def add_new_service():
+    #content = request.get_json(force=True)
+    #content = request.data
+    return jsonify(json.loads(request.data))
+    #return jsonify(content)
+
 
 @app.route("/command/<action>")
 def action(action):

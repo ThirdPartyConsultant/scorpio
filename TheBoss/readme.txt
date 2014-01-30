@@ -17,6 +17,9 @@ and the communication between Pad (boss) and phone (customer)
         #apt-get install python
         #apt-get install nginx
         #apt-get install python-flask
+        #apt-get install python-pip
+        #pip install flask-restfu
+
 
     (2.2) check-out file from github, here assume that the folder is:
         /root/github/scorpio/TheBoss/
