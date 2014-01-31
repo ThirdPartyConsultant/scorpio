@@ -1,4 +1,5 @@
 import sys
+import json
 from flask import request, Flask, jsonify
 from flask import redirect, url_for, send_from_directory
 from apiHandler import ApiHandler
@@ -12,6 +13,17 @@ def hello():
     result = {'msg':'hello boss'}
     return jsonify(result)
 
+@app.route("/run", methods=['PUT'])
+def add_new_run():
+    #content = request.get_json(force=True) 
+    #return jsonify(content)
+    content = request.data
+    result = json.loads(content)
+    #result = {'a':content}                    
+    return jsonify(result)
+    return jsonify(result)
+
+
 @app.route("/services", methods=['GET'])
 def get_all_services():
     result ={'services':['a','b']}
@@ -21,7 +33,9 @@ def get_all_services():
 def add_new_service():
     #content = request.get_json(force=True)
     #content = request.data
-    return jsonify(json.loads(request.data))
+    app.logger.error('??:'+ request.data)
+   # return jsonify(json.loads(request.data))
+    return {"a":"b"}
     #return jsonify(content)
 
 
