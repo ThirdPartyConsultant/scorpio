@@ -1,59 +1,63 @@
 import sys
+import datetime
 import json
+import string
+from random import *
 from flask import request, Flask, jsonify
 from flask import redirect, url_for, send_from_directory
+from flask.ext.restful import reqparse, abort, Api, Resource
 from apiHandler import ApiHandler
 
-
 app = Flask(__name__)
-commandDispatcher = ApiHandler()
+api = Api(app)
 
-@app.route("/hello", methods=['GET', 'POST'])
-def hello():
-    result = {'msg':'hello boss'}
-    return jsonify(result)
+ALL_PERSON_LIST = { }
 
-@app.route("/run", methods=['PUT'])
-def add_new_run():
-    #content = request.get_json(force=True) 
-    #return jsonify(content)
-    content = request.data
-    result = json.loads(content)
-    #result = {'a':content}                    
-    return jsonify(result)
-    return jsonify(result)
+def getRandomID():
+    characters = string.ascii_letters + string.digits
+    id=  "".join(choice(characters) for x in range(randint(8, 8)))
+    return id
 
+def abort_if_doesnt_exist(sid):
+    if sid not in ALL_PERSON_LIST:
+        abort(404, message=" {} doesn't exist".format(sid))
 
-@app.route("/services", methods=['GET'])
-def get_all_services():
-    result ={'services':['a','b']}
-    return jsonify(result)
-
-@app.route("/service", methods=['PUT','POST'])
-def add_new_service():
-    #content = request.get_json(force=True)
-    #content = request.data
-    app.logger.error('??:'+ request.data)
-   # return jsonify(json.loads(request.data))
-    return {"a":"b"}
-    #return jsonify(content)
+parser = reqparse.RequestParser()
+parser.add_argument('task', type=str)
 
 
-@app.route("/command/<action>")
-def action(action):
-    if commandDispatcher.isAction(action):
-        try: 
-            result_from_action = commandDispatcher.execute(action)
-            result = {"execution result":result_from_action}
-        except :
-            result = {"error": sys.exc_info()[0]}
-    else:
-        result = {"error":"no such action"}
-    return jsonify(result)
+# 
+class Person(Resource):
+    def get(self, sid):
+        abort_if_doesnt_exist(sid)
+        return TODOS[todo_id]
+
+    def delete(self, sid):
+        abort_if_doesnt_exist(todo_id)
+        del TODOS[todo_id]
+        return '', 204
+
+    def put(self):
+        args = parser.parse_args()
+        content = request.data
+        new_person = json.loads(content)
+        current_datetime = str(datetime.datetime.now())
+        person = {}
+        person['sid'] = getRandomID()
+        person['createtime'] = current_datetime
+        person['status'] = 'new' # status: new-> taken -> serving -> closed (removed, give-up, noshow)
+        ALL_PERSON_LIST['sid'] = person
+        return ALL_PERSON_LIST, 201
 
 
-if __name__ == "__main__":
+
+##
+## Actually setup the Api resource routing here
+##
+api.add_resource(Person, '/Person')
+
+
+if __name__ == '__main__':
     app.debug = True
-    app.run()
-    #app.run(host='0.0.0.0', port=5000)
-                                         
+    #app.run()
+    app.run(host='0.0.0.0', port=5000)
