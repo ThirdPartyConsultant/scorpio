@@ -63,8 +63,13 @@ class Person(Resource):
         person['createtime'] = current_datetime
         person['status'] = 'new' # status: new-> taken -> serving -> closed (removed, give-up, noshow)
         ALL_PERSON_LIST[sid] = person
-        return ALL_PERSON_LIST, 201
+        return person, 201
 
+    def post(self,sid):
+        abort_if_doesnt_exist(sid, ALL_PERSON_LIST)
+        content = request.data
+        update_person = json.loads(content)
+        return ALL_PERSON_LIST[sid], 201
 
 # 
 class Status(Resource):
