@@ -14,6 +14,24 @@ api = Api(app)
 ALL_PERSON_LIST = { }
 ALL_SERVICE_LIST = { }
 
+parser = reqparse.RequestParser()
+parser.add_argument('task', type=str)
+
+# merge new to origin, replace the value in string and array, recursive handle t he value in dict
+def mergeDict(origin, new):
+    for key in new.keys():
+        if origin.has_key(key):
+            if type(origin[key]) is dict:
+                mergeddict = mergeDict(origin[key], new[key])
+                origin[key] = mergeddict
+            else:
+                origin[key] = new[key]
+        else:
+            origin[key] = new[key]
+
+    return origin
+
+
 def getRandomID():
     characters = string.ascii_letters + string.digits
     id=  "".join(choice(characters) for x in range(randint(8, 8)))
@@ -23,13 +41,12 @@ def abort_if_doesnt_exist(sid, alist):
     if sid not in alist:
         abort(404, message=" {} doesn't exist".format(sid))
 
-parser = reqparse.RequestParser()
-parser.add_argument('task', type=str)
 
 
 class Service(Resource):
     def get(self, name):
-        return ALL_SERVICE_LIST['name']
+        abort_if_doesnt_exist(name, ALL_SERVICE_LIST)
+        return ALL_SERVICE_LIST[name]
 
     def put(self):
         content = request.data
@@ -46,7 +63,7 @@ class Person(Resource):
         person = ALL_PERSON_LIST[sid]
         return person
 
-    def delete(self, sid):
+    def delete(self, name, sid):
         abort_if_doesnt_exist(sid, ALL_PERSON_LIST)
         del ALL_PERSON_LIST[sid]
         return '', 204
@@ -65,10 +82,13 @@ class Person(Resource):
         ALL_PERSON_LIST[sid] = person
         return person, 201
 
-    def post(self,sid):
+    def post(self,name, sid):
         abort_if_doesnt_exist(sid, ALL_PERSON_LIST)
         content = request.data
         update_person = json.loads(content)
+        origin_person = ALL_PERSON_LIST[sid]
+        result = mergeDict(origin_person, update_person)
+        ALL_PERSON_LIST[sid] = result
         return ALL_PERSON_LIST[sid], 201
 
 # 
@@ -93,4 +113,4 @@ api.add_resource(Status, '/Service/<string:name>/Person/<string:sid>/Status')
 if __name__ == '__main__':
     app.debug = True
     #app.run()
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8080)
