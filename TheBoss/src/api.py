@@ -7,6 +7,7 @@ from flask import request, Flask, jsonify
 from flask import redirect, url_for, send_from_directory
 from flask.ext.restful import reqparse, abort, Api, Resource
 from apiHandler import ApiHandler
+from DataAccess import DataAccess
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,6 +17,8 @@ ALL_SERVICE_LIST = { }
 
 parser = reqparse.RequestParser()
 parser.add_argument('task', type=str)
+serviceData = DataAccess('TheBoss','service')
+personData = DataAccess('TheBoss','person')
 
 # merge new to origin, replace the value in string and array, recursive handle t he value in dict
 def mergeDict(origin, new):
@@ -42,26 +45,33 @@ def abort_if_doesnt_exist(sid, alist):
         abort(404, message=" {} doesn't exist".format(sid))
 
 
-
 class Service(Resource):
     def get(self, name):
-        abort_if_doesnt_exist(name, ALL_SERVICE_LIST)
-        return ALL_SERVICE_LIST[name]
+        records = serviceData.select({'name':name})
+        if records.count() == 0:
+            abort(404, message=" {} doesn't exist".format(name))
+        else:
+            service = records.next()
+            service['_id'] = ""
+            return service
 
     def put(self):
         content = request.data
         new_service = json.loads(content)
-        ALL_SERVICE_LIST[new_service['name']] = new_service
-        return ALL_SERVICE_LIST
-
-
+        objId = serviceData.insert(new_service)
+        new_service['_id'] = ""
+        return new_service
     
 # 
 class Person(Resource):
     def get(self, name, sid):
-        abort_if_doesnt_exist(sid, ALL_PERSON_LIST)
-        person = ALL_PERSON_LIST[sid]
-        return person
+        records = personData.select({'sid':sid})
+        if records.count() == 0:
+            abort(404, message=" {} doesn't exist".format(sid))
+        else:
+            person = records.next()
+            person['_id'] = ""
+            return person
 
     def delete(self, name, sid):
         abort_if_doesnt_exist(sid, ALL_PERSON_LIST)
@@ -70,8 +80,8 @@ class Person(Resource):
 
     def put(self,name):
         args = parser.parse_args()
-        content = request.data
-        new_person = json.loads(content)
+        #content = request.data
+        #new_person = json.loads(content)
         current_datetime = str(datetime.datetime.now())
         person = {}
         sid = getRandomID()
@@ -79,17 +89,25 @@ class Person(Resource):
         person['service'] = name 
         person['createtime'] = current_datetime
         person['status'] = 'new' # status: new-> taken -> serving -> closed (removed, give-up, noshow)
-        ALL_PERSON_LIST[sid] = person
+        personData.insert(person)
+        person['_id'] = ""
         return person, 201
 
     def post(self,name, sid):
-        abort_if_doesnt_exist(sid, ALL_PERSON_LIST)
+        person =  {}
+        records = personData.select({'sid':sid})
+        if records.count() == 0:
+            abort(404, message=" {} doesn't exist".format(sid))
+        else:
+            person = records.next()
+            person['_id'] = ""
+
         content = request.data
         update_person = json.loads(content)
-        origin_person = ALL_PERSON_LIST[sid]
+        origin_person = person
         result = mergeDict(origin_person, update_person)
-        ALL_PERSON_LIST[sid] = result
-        return ALL_PERSON_LIST[sid], 201
+        personData.update({'sid':sid},{"$set": result})
+        return result, 201
 
 # 
 class Status(Resource):

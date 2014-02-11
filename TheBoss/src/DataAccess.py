@@ -19,15 +19,22 @@ class DataAccess:
     def select(self, obj):
         return self.collection.find(obj)
 
+    def update(self, oriObj, newObj ):
+        self.collection.update(oriObj, newObj)
 
 
 if __name__ == '__main__':
-    dataAccess = DataAccess("TheBoss","service")
-    test_service = {"name":"test_service","desc":"test service description"}
-    test_service2 = {"name":"test_service","desc":"test service description22"}
-    objId_insert = dataAccess.insert(test_service)
-    objId_insert = dataAccess.insert(test_service2)
-    objId_list = dataAccess.select({"name":"test_service"})
+    dataAccess = DataAccess("TheBoss","person")
+    
+#    test_service = {"name":"test_service","desc":"test service description"}
+#    test_service2 = {"name":"test_service","desc":"test service description22"}
+#    objId_insert = dataAccess.insert(test_service)
+#    objId_insert = dataAccess.insert(test_service2)
+    objId_list = dataAccess.select({"service":"rest1"})
+    print objId_list
     for i in objId_list:
         print i
-        dataAccess.delete(i)
+#        dataAccess.delete(i)
+
+ #   not_exist_obj = dataAccess.select({"name":"rest1"})
+ #   print not_exist_obj.count()
