@@ -30,7 +30,9 @@ and the communication between Pad (boss) and phone (customer)
          cp scorpio/TheBoss/conf/uwsgi_theboss.conf /etc/uwsgi/apps-available
          ln -s /etc/uwsgi/apps-available/uwsgi_theboss.conf /etc/uwsgi/apps-enabled/uwsgi_theboss.ini
 
-    (1.4) restart nginx and uwsgi
-        !! the two service must run in root permission to control GPIO
+    (2.4) restart nginx and uwsgi
 
+(3)  Server side:
+    (3.1) mongodb
+    (3.2) database name: TheBoss
 
