@@ -52,14 +52,14 @@ class Service(Resource):
             abort(404, message=" {} doesn't exist".format(name))
         else:
             service = records.next()
-            service['_id'] = ""
+            del service['_id'] 
             return service
 
     def put(self):
         content = request.data
         new_service = json.loads(content)
         objId = serviceData.insert(new_service)
-        new_service['_id'] = ""
+        del new_service['_id']
         return new_service
     
 # 
@@ -70,7 +70,7 @@ class Person(Resource):
             abort(404, message=" {} doesn't exist".format(sid))
         else:
             person = records.next()
-            person['_id'] = ""
+            del person['_id'] = ""
             return person
 
     def delete(self, name, sid):
@@ -90,7 +90,7 @@ class Person(Resource):
         person['createtime'] = current_datetime
         person['status'] = 'new' # status: new-> taken -> serving -> closed (removed, give-up, noshow)
         personData.insert(person)
-        person['_id'] = ""
+        del person['_id'] = ""
         return person, 201
 
     def post(self,name, sid):
@@ -100,12 +100,13 @@ class Person(Resource):
             abort(404, message=" {} doesn't exist".format(sid))
         else:
             person = records.next()
-            person['_id'] = ""
+            del person['_id'] 
 
         content = request.data
         update_person = json.loads(content)
         origin_person = person
         result = mergeDict(origin_person, update_person)
+        
         personData.update({'sid':sid},{"$set": result})
         return result, 201
 
