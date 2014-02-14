@@ -1,4 +1,6 @@
 package com.example.theboss;
+
+
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,7 +9,7 @@ import java.net.URL;
 import java.util.*;
 import org.json.JSONObject;
 
-class RestAsynExecutor implements Runnable {
+class RestExecutor  {
 	String TARGET_URL = "";
 	String METHOD = "";
 	String REQUEST_JSON_STRING = "{}";
@@ -31,7 +33,7 @@ class RestAsynExecutor implements Runnable {
 		this.CALL_BACK = threadCallBack;
 		
 	}
-	public RestAsynExecutor(String targetUrl, String method) {
+	public RestExecutor(String targetUrl, String method) {
 		this.setMethod(method);
 		this.setTargetUrl(targetUrl);
 	}
@@ -45,11 +47,11 @@ class RestAsynExecutor implements Runnable {
 
 	}
 
-	public void run() {
+	public JSONObject run() {
 
 		URL url;
 		HttpURLConnection urlConnection;
-		JSONObject json;
+		JSONObject json = new JSONObject();
 		try {
 			url = new URL(this.TARGET_URL);
 
@@ -75,8 +77,11 @@ class RestAsynExecutor implements Runnable {
 
 		}
 		// TODO a better way to handle call back...
-		this.CALL_BACK.callback();
-
+		if(this.CALL_BACK != null ) {
+			this.CALL_BACK.callback();
+		}
+		return json;
+		
 	}
 	
 	

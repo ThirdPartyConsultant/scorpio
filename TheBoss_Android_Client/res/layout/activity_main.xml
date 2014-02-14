@@ -38,5 +38,15 @@
         android:layout_alignLeft="@+id/btGenerateQr"
         android:layout_below="@+id/btGenerateQr"
         android:text="Button" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btDoWebApi"
+        android:layout_marginTop="46dp"
+        android:layout_toLeftOf="@+id/qrCode"
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
     
 </RelativeLayout>

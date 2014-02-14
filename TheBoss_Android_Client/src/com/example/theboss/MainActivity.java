@@ -1,12 +1,15 @@
 package com.example.theboss;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 import android.view.*;
 import android.widget.ImageView;
 import android.graphics.Bitmap;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -20,125 +23,65 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
 import java.lang.Runnable;
+
 import org.json.JSONObject;
 
-class RestHandler extends Thread {
-
-	String TARGET_URL = "";
-	String RESULT = "";
-
-	public void setTargetURL(String url) {
-		this.TARGET_URL = url;
-	}
-
-	public void run() {
-		this.RESULT = getTicketFromURL();
-
-	}
-
-	private String convertStreamToString(java.io.InputStream is) {
-		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-		return s.hasNext() ? s.next() : "";
-	}
-
-	private String getTicketFromURL() {
-		System.out.println("get result?!");
-		String result = "";
-		URL url;
-		HttpURLConnection urlConnection;
-		JSONObject json;
-		try {
-			url = new URL(TARGET_URL);
-			urlConnection = (HttpURLConnection) url.openConnection();
-
-			urlConnection.setRequestMethod("PUT");
-			InputStream in = new BufferedInputStream(
-					urlConnection.getInputStream());
-			json = new JSONObject(convertStreamToString(in));
-			result = json.getString("sid");
-			System.out.println("get result?!");
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-
-		}
-		return result;
-	}
-
+class RestClientTask extends AsyncTask<String, Void, String> {
+	Context contextGUI;
+	  public RestClientTask(Context callerclass)
+	    {
+	        contextGUI = callerclass;
+	    }
+	  
+  
+    protected String doInBackground(String... urls) {
+    	RestExecutor restExecutor = new RestExecutor(urls[0],"PUT");
+    	JSONObject result = restExecutor.run();
+        return result.toString();
+        
+    }
+    
+    protected void onPostExecute(String result) {
+    	TextView myTextView = (TextView) ((MainActivity) contextGUI).findViewById(R.id.textView2);
+    	myTextView.setText(result);
+    	
+    }
 }
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements ThreadCallBack{
 
 	ImageView qrView;
-	private static String GET_TICKET_URL = "http://118.161.24.136:5000/Service/test1/Person";
-	RestHandler restHandler = new RestHandler();
-
+	private static String GET_TICKET_URL = "http://118.165.192.32:8080/Service/rest1/Person";
+	RestAsynExecutor REST_CLIENT ;
+	ThreadCallBack CALL_BACK;
+    TextView myTextView ;
+    MainActivity SELF_REF;
+	public void callback(){
+		JSONObject result = this.REST_CLIENT.getResult();
+		System.out.println(result);
+		setContentView(R.layout.activity_main);
+	        myTextView = (TextView)findViewById(R.id.textView2);
+	        myTextView.setText(result.toString());
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.CALL_BACK = this;
 		setContentView(R.layout.activity_main);
 		final Button btGenerateQr = (Button) findViewById(R.id.btGenerateQr);
 		final Button btDoWebApi = (Button) findViewById(R.id.btDoWebApi);
 		qrView = (ImageView) findViewById(R.id.qrCode);
+		SELF_REF = this;
 		btGenerateQr.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				System.out.println("to generate QR");
 				// Perform action on click
-				background.start();
-
-			}
-
-			Thread background = new Thread(new Thread() {
-
-	
-
-				// After call for background.start this run method call
-				public void run() {
-
-					String result = "";
-					URL url;
-					HttpURLConnection urlConnection;
-					JSONObject json;
-					try {
-						url = new URL(GET_TICKET_URL);
-						
-						urlConnection = (HttpURLConnection) url
-								.openConnection();
-
-						urlConnection.setRequestMethod("PUT");
-						InputStream in = new BufferedInputStream(urlConnection
-								.getInputStream());
-						json = new JSONObject(convertStreamToString(in));
-						result = json.getString("sid");
-						System.out.println("get result?!" + result);
-						generateQr(result);
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-
-					}
-
-				}
-
-				private String convertStreamToString(java.io.InputStream is) {
-					java.util.Scanner s = new java.util.Scanner(is)
-							.useDelimiter("\\A");
-					return s.hasNext() ? s.next() : "";
-				}
-
-			});
-			
-			
-
-		});
-		btDoWebApi.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				doWebApi();
-				// Perform action on click
-				System.out.println("to generate QR");
-				Log.e("aa", "msg");
+				new RestClientTask(SELF_REF).execute(GET_TICKET_URL);
+		
 			}
 		});
+		
 	}
 
 	private String convertStreamToString(java.io.InputStream is) {
