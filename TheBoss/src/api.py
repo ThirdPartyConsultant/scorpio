@@ -70,7 +70,7 @@ class Person(Resource):
             abort(404, message=" {} doesn't exist".format(sid))
         else:
             person = records.next()
-            del person['_id'] = ""
+            del person['_id']
             return person
 
     def delete(self, name, sid):
@@ -90,7 +90,7 @@ class Person(Resource):
         person['createtime'] = current_datetime
         person['status'] = 'new' # status: new-> taken -> serving -> closed (removed, give-up, noshow)
         personData.insert(person)
-        del person['_id'] = ""
+        del person['_id']
         return person, 201
 
     def post(self,name, sid):
@@ -131,5 +131,5 @@ api.add_resource(Status, '/Service/<string:name>/Person/<string:sid>/Status')
 
 if __name__ == '__main__':
     app.debug = True
-    #app.run()
-    app.run(host='0.0.0.0', port=8080)
+    app.run()
+    #app.run(host='0.0.0.0', port=8080)
