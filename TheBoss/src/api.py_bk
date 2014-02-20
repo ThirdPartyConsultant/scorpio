@@ -1,0 +1,81 @@
+import sys
+import datetime
+import json
+import string
+from random import *
+from flask import request, Flask, jsonify
+from flask import redirect, url_for, send_from_directory
+from apiHandler import ApiHandler
+
+
+app = Flask(__name__)
+commandDispatcher = ApiHandler()
+app.runs = {}
+
+def getRandomID():
+    characters = string.ascii_letters + string.digits
+    id=  "".join(choice(characters) for x in range(randint(8, 8)))
+    return id
+
+@app.route("/hello", methods=['GET', 'POST'])
+def hello():
+    result = {'msg':'hello boss2'}
+    return jsonify(result)
+
+@app.route("/person", methods=['PUT'])
+def add_new_person():
+    createtime = str(datetime.datetime.now())
+    person = {'sid' : getRandomID(), 'createtime' : createtime, 'status':'hold'  }
+    """ person {"sid":<random numner>, "run":<run>, "service",<which service>, "status",<queue,in,closed> , "createtime":<time of created>, "intime":<when in service>, "closedtime":<when closed>, "no":<current number>, "phone":<phone number>, "desc":description} """
+    return jsonify(person)
+
+@app.route("/person", methods=['POST'])
+def update_person():
+    return jsonify(person)
+
+@app.route("/run", methods=['PUT'])
+def add_new_run():
+    #content = request.get_json(force=True) 
+    #return jsonify(content)
+    content = request.data
+    arun = json.loads(content)
+    currentDate = str(datetime.date.today())
+    runName = arun['name'] + currentDate
+    app.runs[runName] = arun
+    #result = {'a':content}                    
+    return jsonify(app.runs)
+
+
+@app.route("/services", methods=['GET'])
+def get_all_services():
+    result ={'services':['a','b']}
+    return jsonify(result)
+
+@app.route("/service", methods=['PUT','POST'])
+def add_new_service():
+    #content = request.get_json(force=True)
+    #content = request.data
+    app.logger.error('??:'+ request.data)
+   # return jsonify(json.loads(request.data))
+    return {"a":"b"}
+    #return jsonify(content)
+
+
+@app.route("/command/<action>")
+def action(action):
+    if commandDispatcher.isAction(action):
+        try: 
+            result_from_action = commandDispatcher.execute(action)
+            result = {"execution result":result_from_action}
+        except :
+            result = {"error": sys.exc_info()[0]}
+    else:
+        result = {"error":"no such action"}
+    return jsonify(result)
+
+
+if __name__ == "__main__":
+    app.debug = True
+    #app.run()
+    app.run(host='0.0.0.0', port=5000)
+                                         
