@@ -120,6 +120,11 @@ class Person(Resource):
 
 # 
 class CommonDo(Resource):
+    def delete(self, collectionName, sid):
+        commonDo = DataAccess('TheBoss',collectionName)
+        commonDo.delete({'sid':sid})
+        return 201
+
     def post(self,collectionName, sid):
         currentContent =  {}
         commonDo = DataAccess('TheBoss',collectionName)
