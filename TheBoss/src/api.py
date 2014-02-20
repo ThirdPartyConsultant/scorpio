@@ -8,6 +8,14 @@ from flask import redirect, url_for, send_from_directory
 from flask.ext.restful import reqparse, abort, Api, Resource
 from apiHandler import ApiHandler
 from DataAccess import DataAccess
+from bson import ObjectId
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -111,13 +119,46 @@ class Person(Resource):
         return result, 201
 
 # 
-class Status(Resource):
-    def post(self, name, sid):
-        args = parser.parse_args()
+class CommonDo(Resource):
+    def post(self,collectionName, sid):
+        currentContent =  {}
+        commonDo = DataAccess('TheBoss',collectionName)
+        records = commonDo.select({'sid':sid})
+        if records.count() == 0:
+            abort(404, message=" {} doesn't exist".format(sid))
+        else:
+            currentContent = records.next()
+            del currentContent['_id'] 
+
         content = request.data
-        person = json.loads(content)
-        ALL_PERSON_LIST[sid]['status'] = person['status']
-        return 201
+        updateContent = json.loads(content)
+        
+        result = mergeDict(currentContent, updateContent)
+        commonDo.update({'sid':sid}, {"$set": result})
+        return JSONEncoder().encode(result), 201
+        
+        commonDo.update({'sid':sid},{"$set": result})
+
+    def put(self, collectionName):
+        commonDo = DataAccess('TheBoss',collectionName)
+        content = request.data
+        jsonContent = json.loads(content)
+        sid = getRandomID()
+        jsonContent['sid'] = sid
+        print "before=="
+        print jsonContent
+        commonDo.insert(jsonContent)
+        return JSONEncoder().encode(jsonContent), 201
+        #return jsonContent, 201
+
+    def get(self, collectionName, sid):
+        commonDo = DataAccess('TheBoss',collectionName)
+        records = commonDo.select({'sid':sid})
+        if records.count() == 0:
+            abort(404, message=" {} doesn't exist".format(sid))
+        else:
+            content = records.next()
+            return JSONEncoder().encode(content), 201
 
 ######################################################################
 api.add_resource(Person, '/Person')
@@ -126,10 +167,11 @@ api.add_resource(Service, '/Service/<string:name>')
 api.add_resource(Service, '/Service')
 api.add_resource(Person, '/Service/<string:name>/Person')
 api.add_resource(Person, '/Service/<string:name>/Person/<string:sid>')
-api.add_resource(Status, '/Service/<string:name>/Person/<string:sid>/Status')
+api.add_resource(CommonDo, '/Cdo/<string:collectionName>/<string:sid>')
+api.add_resource(CommonDo, '/Cdo/<string:collectionName>')
 
 
 if __name__ == '__main__':
     app.debug = True
-    app.run()
-    #app.run(host='0.0.0.0', port=8080)
+    #app.run()
+    app.run(host='0.0.0.0', port=8080)
