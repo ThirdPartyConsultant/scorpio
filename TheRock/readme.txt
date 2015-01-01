@@ -7,11 +7,11 @@ Purpose: provide a easy utility for mobile to control Raspberry PI.
 
 (1) quick deployment method.
     (1.1) install following packages:
-        #apt-get install uwsgi
-        #apt-get install uwsgi-plugin-python
-        #apt-get install python
-        #apt-get install nginx
-        #apt-get install python-flask
+        apt-get install uwsgi
+        apt-get install uwsgi-plugin-python
+        apt-get install python
+        apt-get install nginx
+        apt-get install python-flask
 
     (1.2) check-out file from github, here assume that the folder is:
         /root/github/scorpio/TheRock/
@@ -35,3 +35,7 @@ Purpose: provide a easy utility for mobile to control Raspberry PI.
        current actions:
        * turn_on_light (turn the LED in pin-18 to on)
        * turn_off_light (turn the LED in pin-18 to off)
+
+
+(3) debug
+    * permission issues in /tmp/uwsgi.sock
